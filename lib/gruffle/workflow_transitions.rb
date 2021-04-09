@@ -1,16 +1,11 @@
 module WorkflowTransitions
-  def transition(from:, via:)
+  def transition(klass, source:)
     # TODO: allow other options when declaring transition
-    # - when (condition)
-    # - error (error state)
+    # - condition:
+    # - error:
 
-    # TODO: revisit signature
-    # Maybe via: shouldn't be a named param; maybe the signature should be `transition(klass, from:, when:, error:)`.
-    # It reads kinda nicely to have via, but `transition FooTransition, from: BarState` is more consistent with state
-    # declaration signature
-
-    state_klass = from
-    transition_klass = via
+    transition_klass = klass
+    state_klass = source
 
     ensure_transition_setup
 
@@ -21,10 +16,10 @@ module WorkflowTransitions
     nil
   end
 
-  def transitions(*from)
+  def transitions(*sources)
     # TODO: sort of a bummer to have an implicit dependency on WorkflowTransitions being mixed in with WorkflowStates
-    from = self.states.keys if from.empty?
-    @transitions.slice(*from).values
+    sources = self.states.keys if sources.empty?
+    @transitions.slice(*sources).values
   end
 
   private

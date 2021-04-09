@@ -53,8 +53,8 @@ describe Gruffle::Workflow do
       state RegularState
       final_state FinalState
 
-      transition from: InitialState, via: FirstTransition
-      transition from: RegularState, via: SecondTransition
+      transition FirstTransition, source: InitialState
+      transition SecondTransition, source: RegularState
     end
 
     before do
