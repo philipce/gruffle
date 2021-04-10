@@ -115,6 +115,13 @@ An edge is a connection between nodes. It represents the processing of a node, e
 
 ### Adapters
 
+Available adapters:
+- worker queue
+- data store
+- logging
+- version compatibility
+- killswitch / cancellation handler (this should get called after picking up a node before working it, as well as get called when a node fails out, e.g. could cancel non-deterministic siblings of the failed node)
+
 ### Engine
 
 ## Scaling
@@ -124,3 +131,48 @@ An edge is a connection between nodes. It represents the processing of a node, e
 ## Contributing
 
 All contributions are welcome! Feel free to make a pull request or open an issue.
+
+
+
+Welcome to Gruffle! Blah blah intro sentence or two. If you're the kind of person who likes reading docs, carry on. If you'd rather just jump in and get your hands dirty, check out a [working code sample](TODO).
+
+A `Workflow` defines a series of tasks to perform that together constitute a larger piece of useful work. Said another way, a workflow is a tool used to decompose a large piece of work into a collection of smaller tasks. The workflow defines these tasks in terms of independent stages called `States`. It also specifies what dependencies exist between these stages and how data will flow between them using what are called `Transitions` and `Conditions`.  
+
+A State is an immutable collection of data. It encapsulates all the necessary parameters to perform some small piece of work; essentially, it's a parameter object to some function. Those functions are called Transitions. 
+
+Transitions consume a single state and result in one or more successor states. This is where the actual work gets done; whatever processing is required to advance through a workflow is encapsulated in its constituent transition functions.
+
+Conditions are used by a workflow to control the conditions under which particular states should be fed to particular transitions.
+
+You may notice that a workflow sounds a lot like a state machine. That's a pretty good analogy. The Workflow defines what state to begin in, which states are terminal, and the conditions under which one state transitions to another. The workflow is used by the Gruffle `Engine` to advance from state to state until the necessary computation is done and the larger piece of work is complete.
+
+Unlike typical state machines however, a workflow does not have the constraint that the computation be in one state at a time. A workflow allows for processing to occur on many workers in parallel, and provides tools for helping to synchronize intermediate results between workers. This parallelism is not necessarily constrained to a single machine, allowing for workers to be distributed in a scalable way.
+
+One of the other benefits a workflow offers is the ability to introspect the processing trace for a particular execution of a piece of work. This allows visibility into which tasks were performed, when they were performed, and with what results, without requiring a lot of manual logging by the user. This helps make large, distributed jobs highly traceable.
+
+The last key benefit of the workflow approach is in how errors are handled. Because each individual state can be processed independently of the others, this allows the workflow engine to reprocess and retry failures at the state level; if the transition from one state to another blows up, we only have to retry that single transition rather than the entire workflow up to that point. Errors themselves are modeled as states in the workflow, which also makes it simple to define custom error handling in a scalable and traceable way. All this serves to help write jobs that are robust and reliable.
+
+If all this is still sounding too abstract, we encourage you to check out the [concrete example](TODO) mentioned earlier. It'll walk you through an example implementation of a workflow and compare it to a more familiar, monolithic implementation.
+
+
+
+
+
+
+Add concept of a Workflow Inspector. That's used to ask questions about if a workflow has reached a final state, for example.
+
+
+
+Each state represents a small piece of work to be done. States are processed by transitions, which are responsible for actually performing the work represented by the transition.
+ 
+ 
+ 
+ Taken all together, the states (or small pieces of work) add up to the larger workflow. that contributes to the overall objective of the workflow.
+ 
+ 
+ 
+ Engine or Driver? What are the verbs for the functions? Start vs run? Listen vs await vs subscribe vs something better? Setup vs new vs init?
+ 
+ Language: transitions have a *source* state and some number of *target* states? If we use target, is that weird that a transition returns a TransitionResult? Maybe TransitionResult.targets is a thing?
+ 
+ Because of how Ruby handles threads, CPU-bound workflows won't see a performance boost from multi-threading, thought the traceability and reliability benefits still apply. IO-bound workflows should expect to see some performance gains from using more than 1 thread.
