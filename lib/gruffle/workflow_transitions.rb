@@ -17,6 +17,7 @@ module WorkflowTransitions
   end
 
   def transitions(*sources)
+    ensure_transition_setup
     # TODO: sort of a bummer to have an implicit dependency on WorkflowTransitions being mixed in with WorkflowStates
     sources = self.states.keys if sources.empty?
     @transitions.slice(*sources).values

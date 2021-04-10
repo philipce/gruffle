@@ -23,6 +23,7 @@ module WorkflowStates
   end
 
   def states(*types)
+    ensure_state_setup
     types = STATE_TYPES.to_a if types.empty?
     @states.select { |_klass, options| types.include?(options[:type]) }
   end

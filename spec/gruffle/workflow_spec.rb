@@ -1,17 +1,17 @@
 require 'spec_helper'
 
 describe Gruffle::Workflow do
+  class InitialState < Gruffle::State; end
+  class RegularState1 < Gruffle::State; end
+  class RegularState2 < Gruffle::State; end
+  class SyncState < Gruffle::State; end
+  class FinalState < Gruffle::State; end
+
+  class FirstTransition < Gruffle::Transition; end
+  class SecondTransition < Gruffle::Transition; end
+
   describe 'workflow states' do
-    class InitialState < Gruffle::State; end
-    class RegularState1 < Gruffle::State; end
-    class RegularState2 < Gruffle::State; end
-    class SyncState < Gruffle::State; end
-    class FinalState < Gruffle::State; end
-
     class StatesWorkflow < Gruffle::Workflow
-      # TODO: add real validations, remove dummy validation
-      @dummy_validation = true
-
       initial_state InitialState
       state RegularState1
       state RegularState2
@@ -39,22 +39,13 @@ describe Gruffle::Workflow do
   end
 
   describe 'workflow transitions' do
-    class InitialState < Gruffle::State; end
-    class RegularState < Gruffle::State; end
-    class FinalState < Gruffle::State; end
-    class FirstTransition < Gruffle::Transition; end
-    class SecondTransition < Gruffle::Transition; end
-
     class TransitionsWorkflow < Gruffle::Workflow
-      # TODO: add real validations, remove dummy validation
-      @dummy_validation = true
-
       initial_state InitialState
-      state RegularState
+      state RegularState1
       final_state FinalState
 
       transition FirstTransition, source: InitialState
-      transition SecondTransition, source: RegularState
+      transition SecondTransition, source: RegularState1
     end
 
     before do
@@ -64,30 +55,62 @@ describe Gruffle::Workflow do
     it 'can declare transitions' do
       expect(TransitionsWorkflow.transitions).to match_array [FirstTransition, SecondTransition]
       expect(TransitionsWorkflow.transitions(InitialState)).to match_array [FirstTransition]
-      expect(TransitionsWorkflow.transitions(InitialState, RegularState)).to match_array [FirstTransition, SecondTransition]
+      expect(TransitionsWorkflow.transitions(InitialState, RegularState1)).to match_array [FirstTransition, SecondTransition]
       expect(TransitionsWorkflow.transitions(FinalState)).to eq []
     end
   end
 
   describe 'workflow validation' do
-    class GoodWorkflow < Gruffle::Workflow
-      @dummy_validation = true
+    class SingleStateWorkflow < Gruffle::Workflow
+      state RegularState1
     end
 
-    class BadWorkflow < Gruffle::Workflow
-      @dummy_validation = false
+    class ZeroStateWorkflow < Gruffle::Workflow; end
+
+    class NotAGruffleState; end
+    class NotAGruffleTransition; end
+    class NonConformingInheritanceWorkflow < Gruffle::Workflow
+      state NotAGruffleState
+      transition NotAGruffleTransition, source: NotAGruffleState
     end
 
-    it 'determines if a workflow is valid' do
-      expect(GoodWorkflow).to be_valid
-      expect(BadWorkflow).to be_invalid
+    class AbstractBassClassWorkflow < Gruffle::Workflow
+      state Gruffle::State
+      transition Gruffle::Transition, source: Gruffle::State
     end
 
-    it 'returns error messages' do
-      expect(GoodWorkflow.errors).to eq []
-      expect(BadWorkflow.errors).to eq ['dummy']
+    it 'provides methods to determine workflow validity' do
+      expect(SingleStateWorkflow).to respond_to :valid?
+      expect(SingleStateWorkflow).to respond_to :invalid?
+      expect(SingleStateWorkflow).to respond_to :errors
+    end
+
+    it 'ensures at least one state is declared' do
+      expect(SingleStateWorkflow).to be_valid
+      expect(SingleStateWorkflow.errors).to eq []
+
+      expect(ZeroStateWorkflow).to be_invalid
+      expect(ZeroStateWorkflow.errors).to include(match /at least one state/)
+    end
+
+    it 'requires correct state inheritance' do
+      expect(NonConformingInheritanceWorkflow).to be_invalid
+      expect(NonConformingInheritanceWorkflow.errors).to include(match /must inherit from Gruffle::State/)
+    end
+
+    it 'does not allow declaring states of abstract base type' do
+      expect(AbstractBassClassWorkflow).to be_invalid
+      expect(AbstractBassClassWorkflow.errors).to include(match /must inherit from Gruffle::State/)
+    end
+
+    it 'requires correct transition inheritance' do
+      expect(NonConformingInheritanceWorkflow).to be_invalid
+      expect(NonConformingInheritanceWorkflow.errors).to include(match /must inherit from Gruffle::Transition/)
+    end
+
+    it 'does not allow declaring transitions of abstract base type' do
+      expect(AbstractBassClassWorkflow).to be_invalid
+      expect(AbstractBassClassWorkflow.errors).to include(match /must inherit from Gruffle::Transition/)
     end
   end
-
-
 end
