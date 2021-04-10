@@ -7,8 +7,6 @@ module WorkflowTransitions
     transition_klass = klass
     state_klass = source
 
-    ensure_transition_setup
-
     @transitions[state_klass] = transition_klass
 
     # TODO: is there a meaningful return type here?
@@ -17,15 +15,8 @@ module WorkflowTransitions
   end
 
   def transitions(*sources)
-    ensure_transition_setup
     # TODO: sort of a bummer to have an implicit dependency on WorkflowTransitions being mixed in with WorkflowStates
     sources = self.states.keys if sources.empty?
     @transitions.slice(*sources).values
-  end
-
-  private
-
-  def ensure_transition_setup
-    @transitions ||= {}
   end
 end
