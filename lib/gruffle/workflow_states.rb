@@ -31,9 +31,6 @@ module WorkflowStates
 
   def add_state(klass, options)
     @states[klass] = options
-
-    # TODO: is there a meaningful return type here?
-    # True if it was declared, false if not? Seems like that might be overreaching and best left to validation
     nil
   end
 end

@@ -6,11 +6,7 @@ module WorkflowTransitions
 
     transition_klass = klass
     state_klass = source
-
     @transitions[state_klass] = transition_klass
-
-    # TODO: is there a meaningful return type here?
-    # True if it was declared, false if not? Seems like that might be overreaching and best left to validation
     nil
   end
 
