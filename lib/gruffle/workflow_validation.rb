@@ -33,7 +33,6 @@ module WorkflowValidation
   end
 
   def at_least_one_state
-    # TODO: sort of a bummer to have an implicit dependency on WorkflowTransitions being mixed in with WorkflowStates
     valid = self.states.keys.count >= 1
     message = 'Workflow must declare at least one state' unless valid
 
@@ -41,7 +40,6 @@ module WorkflowValidation
   end
 
   def correct_state_inheritance
-    # TODO: sort of a bummer to have an implicit dependency on WorkflowTransitions being mixed in with WorkflowStates
     valid = self.states.keys.all? { |s| s < Gruffle::State }
     message = 'Workflow states must inherit from Gruffle::State' unless valid
 
@@ -49,7 +47,6 @@ module WorkflowValidation
   end
 
   def correct_transition_inheritance
-    # TODO: sort of a bummer to have an implicit dependency on WorkflowTransitions being mixed in with WorkflowStates
     valid = self.transitions.all? { |s| s < Gruffle::Transition }
     message = 'Workflow states must inherit from Gruffle::Transition' unless valid
 
