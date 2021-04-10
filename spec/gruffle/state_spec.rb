@@ -6,7 +6,7 @@ describe Gruffle::State do
       state = described_class.new(workflow_name: 'Foo')
       expect(state.workflow_name).to eq 'Foo'
       expect(state.workflow_id).to match UUID_REGEX
-      expect(state.name).to eq 'State'
+      expect(state.name).to eq 'Gruffle::State'
       expect(state.id).to match UUID_REGEX
       expect(state.trace).to be_empty
       expect(state.fork_token).to eq nil

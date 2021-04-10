@@ -44,10 +44,6 @@ module Gruffle
       successor_state
     end
 
-    def self.name
-      super.split('::').last
-    end
-
     def self.deserialize(json_string)
       hash = JSON.parse(json_string, symbolize_names: true)
 
