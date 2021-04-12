@@ -57,5 +57,6 @@ module WorkflowValidation
   # - same state cannot be declared more than once (whether multiple times as same type or as different types)
   # - exactly one single initial state and one final state must be declared (what about workflows that have a single state? maybe for convenience, if only one state is declared, infer final and initial)
   # - all declared transitions must inherit from Gruffle::Transition
-  # - source states must be declared before transitions
+  # - source states must be declared before transitions (does this even matter? i think order probably doesn't matter)
+  # - work queue inherits from correct type (or other way to enforce interface?)
 end

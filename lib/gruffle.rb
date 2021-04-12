@@ -1,3 +1,4 @@
+require 'gruffle/local_work_queue'
 require 'gruffle/state'
 require 'gruffle/trace'
 require 'gruffle/transition'
