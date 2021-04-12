@@ -60,6 +60,31 @@ describe Gruffle::Workflow do
     end
   end
 
+  describe 'workflow state store' do
+    class NonDefaultStateStore; end
+    class StateStoreWorkflow < Gruffle::Workflow
+      state RegularState1
+      state_store NonDefaultStateStore
+    end
+
+    class DefaultStateStoreWorkflow < Gruffle::Workflow
+      state RegularState1
+    end
+
+    before do
+      expect(StateStoreWorkflow).to be_valid
+      expect(DefaultStateStoreWorkflow).to be_valid
+    end
+
+    it 'provides access to the declared state store' do
+      expect(StateStoreWorkflow.state_store).to eq NonDefaultStateStore
+    end
+
+    it 'has a default work queue' do
+      expect(DefaultStateStoreWorkflow.state_store).to eq Gruffle::LocalStateStore
+    end
+  end
+
   describe 'workflow work queue' do
     class NonDefaultWorkQueue; end
     class WorkQueueWorkflow < Gruffle::Workflow

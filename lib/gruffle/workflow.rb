@@ -1,4 +1,5 @@
 require 'gruffle/workflow_states'
+require 'gruffle/workflow_state_store'
 require 'gruffle/workflow_transitions'
 require 'gruffle/workflow_validation'
 require 'gruffle/workflow_work_queue'
@@ -15,9 +16,11 @@ module Gruffle
       @states ||= {}
       @transitions ||= {}
       @work_queue = nil
+      @state_store = nil
     end
 
     extend WorkflowStates
+    extend WorkflowStateStore
     extend WorkflowTransitions
     extend WorkflowValidation
     extend WorkflowWorkQueue

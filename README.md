@@ -176,3 +176,5 @@ Each state represents a small piece of work to be done. States are processed by 
  Language: transitions have a *source* state and some number of *target* states? If we use target, is that weird that a transition returns a TransitionResult? Maybe TransitionResult.targets is a thing?
  
  Because of how Ruby handles threads, CPU-bound workflows won't see a performance boost from multi-threading, thought the traceability and reliability benefits still apply. IO-bound workflows should expect to see some performance gains from using more than 1 thread.
+ 
+ Note on side_effectors: this should maybe be declared in the workflow as an option on each state that needs it? For instance you could pass in your own DataLake interface or something. The state_store would probably be a common one, so maybe it could just be ... side_effectors: { state_store: true, s3: MyS3DataLake ... } and the workflow would know to treat state_store specially
