@@ -3,7 +3,7 @@
 [![Gem Version](https://badge.fury.io/rb/gruffle.svg)](https://badge.fury.io/rb/gruffle)
 ![License](https://img.shields.io/github/license/philipce/gruffle)
 
-Gruffle is a framework that helps developers decompose large jobs into small units of work. The goal is to encourage patterns and provide tools that help improve traceability, reliability, and scalability.
+Gruffle is a framework that helps developers decompose large jobs into small units of work. The goal is to encourage patterns and provide tools that improve traceability, reliability, and scalability.
 
 ## Table of Contents
 
