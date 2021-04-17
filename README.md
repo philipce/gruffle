@@ -106,4 +106,4 @@ TODO: add detail on
 
 ## Contributing
 
-All contributions are welcome! Feel free to make a pull request or open an issue.
+All contributions are welcome, provided they are in accordance with our [code of conduct](CODE_OF_CONDUCT.md). Feel free to make a pull request or open an issue.
