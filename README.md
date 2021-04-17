@@ -14,7 +14,7 @@ Gruffle is a framework that helps developers decompose large jobs into small uni
     - [Engine](#engine)
     - [Adapters](#adapters)
 - [Example Application](#example-application)    
-- [Scaling Workflows](#scaling)
+- [Scaling Workflows](#scaling-workflows)
 - [Contributing](#contributing)
 
 ## Overview
