@@ -19,7 +19,7 @@ Gruffle is a framework that helps developers decompose large jobs into small uni
 
 ## Overview
 
-The most straightforward way to code up some arbitrary job is as a monolithic function. This isn't necessarily a bad approach--it's easy to do, may be performant, and can be quite readable when well-factored. For example, consider the job defined below:
+The most straightforward way to code up some arbitrary job is as a monolithic function. This isn't necessarily a bad approach—it's easy to do, may be performant, and can be quite readable when well-factored. For example, consider the job defined below:
 
 ```ruby
 def job(input)
