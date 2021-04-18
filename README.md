@@ -83,6 +83,20 @@ TODO: Add detail on
 - patterns for running engines
 - execution hooks
 
+### Inspector
+
+TODO: add detail on
+- how inspector lets you see the intermediate steps and results
+
+### Side Effectors
+
+TODO: add detail on
+- what the pattern is and why it's useful
+- how to declare side effectors
+- what contexts can have access to side effectors
+- how to request side effectors
+- interface for writing your own (e.g. initialize method)
+
 ### Adapters
 
 TODO: add detail on
@@ -91,6 +105,14 @@ TODO: add detail on
 - default adapters
 - limitations of default adapters
 - link to scaling section and description of how/why
+
+#### Work Queue
+
+#### State Store
+
+#### Monitor
+
+#### Kill Switch
 
 ## Example Application
 
