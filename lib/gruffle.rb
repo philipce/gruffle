@@ -1,3 +1,5 @@
+require 'gruffle/engine'
+require 'gruffle/inspector'
 require 'gruffle/local_state_store'
 require 'gruffle/local_work_queue'
 require 'gruffle/state'

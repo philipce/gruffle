@@ -1,4 +1,5 @@
 module WorkflowWorkQueue
+  # TODO: add named config param with default nil so config can be provided to initialize adapter (e.g. redis connection details)
   def work_queue(adapter = nil)
     return assign_work_queue_adapter(adapter) unless adapter.nil?
     get_work_queue_adapter
@@ -6,14 +7,16 @@ module WorkflowWorkQueue
 
   private
 
-  def assign_work_queue_adapter(adapter)
-    @work_queue = adapter
+  DEFAULT_WORK_QUEUE = Gruffle::LocalWorkQueue
+
+  def assign_work_queue_adapter(adapter = nil)
+    adapter ||= DEFAULT_WORK_QUEUE
+    @work_queue = adapter.new
     nil
   end
 
-  DEFAULT_WORK_QUEUE = Gruffle::LocalWorkQueue
-
   def get_work_queue_adapter
-    @work_queue || DEFAULT_WORK_QUEUE
+    assign_work_queue_adapter unless @work_queue
+    @work_queue
   end
 end

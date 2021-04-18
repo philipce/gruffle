@@ -1,7 +1,8 @@
 require 'spec_helper'
 
 describe Gruffle::Transition do
-  let(:state) { Gruffle::State.new(workflow_name: 'Foo', payload: {a: 1}) }
+  let(:uuid) { SecureRandom.uuid }
+  let(:state) { Gruffle::State.new(workflow_name: 'Foo', workflow_id: uuid, payload: {a: 1}) }
   let(:transition) { Gruffle::Transition.new }
 
   it 'has a name' do

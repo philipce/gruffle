@@ -5,10 +5,35 @@ describe Gruffle::Workflow do
   class RegularState1 < Gruffle::State; end
   class RegularState2 < Gruffle::State; end
   class SyncState < Gruffle::State; end
+  class JoinState < Gruffle::State; end
   class FinalState < Gruffle::State; end
 
   class FirstTransition < Gruffle::Transition; end
   class SecondTransition < Gruffle::Transition; end
+
+  describe '#initialize' do
+    class InitializationWorkflow < Gruffle::Workflow
+      initial_state InitialState
+      final_state FinalState
+    end
+
+    before do
+      expect(InitializationWorkflow).to be_valid
+    end
+
+    it 'returns a workflow instance with initial state' do
+      payload = { foo: 123 }
+      workflow_instance = InitializationWorkflow.new(payload)
+
+      # TODO: maybe the instance shouldn't provide the initial state. Maybe the Gruffle::Inspector _takes_ a workflow
+      # instance (or class) and then you can query the inspector for whatever states you want
+      initial_state = workflow_instance.initial_state
+
+      expect(workflow_instance.id).to match UUID_REGEX
+      expect(workflow_instance.id).to eq initial_state.workflow_id
+      expect(initial_state.payload).to eq payload
+    end
+  end
 
   describe 'workflow states' do
     class StatesWorkflow < Gruffle::Workflow
@@ -16,6 +41,7 @@ describe Gruffle::Workflow do
       state RegularState1
       state RegularState2
       sync_state SyncState
+      join_state JoinState
       final_state FinalState
     end
 
@@ -27,10 +53,11 @@ describe Gruffle::Workflow do
       expect(StatesWorkflow.states(:initial).keys).to match_array [InitialState]
       expect(StatesWorkflow.states(:regular).keys).to match_array [RegularState1, RegularState2]
       expect(StatesWorkflow.states(:sync).keys).to match_array [SyncState]
+      expect(StatesWorkflow.states(:join).keys).to match_array [JoinState]
       expect(StatesWorkflow.states(:final).keys).to match_array [FinalState]
       expect(StatesWorkflow.states(:initial, :final).keys).to match_array [InitialState, FinalState]
       expect(StatesWorkflow.states(:regular, :sync, :final).keys).to match_array [RegularState1, RegularState2, SyncState, FinalState]
-      expect(StatesWorkflow.states.keys).to match_array [InitialState, RegularState1, RegularState2, SyncState, FinalState]
+      expect(StatesWorkflow.states.keys).to match_array [InitialState, RegularState1, RegularState2, SyncState, JoinState, FinalState]
     end
 
     it 'ignores invalid types' do
@@ -77,11 +104,11 @@ describe Gruffle::Workflow do
     end
 
     it 'provides access to the declared state store' do
-      expect(StateStoreWorkflow.state_store).to eq NonDefaultStateStore
+      expect(StateStoreWorkflow.state_store).to be_a NonDefaultStateStore
     end
 
     it 'has a default work queue' do
-      expect(DefaultStateStoreWorkflow.state_store).to eq Gruffle::LocalStateStore
+      expect(DefaultStateStoreWorkflow.state_store).to be_a Gruffle::LocalStateStore
     end
   end
 
@@ -102,11 +129,11 @@ describe Gruffle::Workflow do
     end
 
     it 'provides access to the declared work queue' do
-      expect(WorkQueueWorkflow.work_queue).to eq NonDefaultWorkQueue
+      expect(WorkQueueWorkflow.work_queue).to be_a NonDefaultWorkQueue
     end
 
     it 'has a default work queue' do
-      expect(DefaultWorkQueueWorkflow.work_queue).to eq Gruffle::LocalWorkQueue
+      expect(DefaultWorkQueueWorkflow.work_queue).to be_a Gruffle::LocalWorkQueue
     end
   end
 

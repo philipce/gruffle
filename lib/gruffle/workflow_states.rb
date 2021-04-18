@@ -4,7 +4,7 @@ module WorkflowStates
   # TODO: any other state types to add? E.g. add :error type?
   # Maybe a workflow only gets a single final state? Error states could be a different state type, not final. That
   # means we could add an error_state method that would let you declare what states to rescue with which error states
-  STATE_TYPES = Set.new([:initial, :regular, :sync, :final]).freeze
+  STATE_TYPES = Set.new([:initial, :regular, :sync, :join, :final]).freeze
 
   def initial_state(klass)
     add_state(klass, { type: :initial })
@@ -16,6 +16,10 @@ module WorkflowStates
 
   def sync_state(klass)
     add_state(klass, { type: :sync })
+  end
+
+  def join_state(klass)
+    add_state(klass, { type: :join })
   end
 
   def final_state(klass)
