@@ -28,7 +28,8 @@ def job(input)
   a = foo(input)
   b = bar(a)
   c = baz(a)
-  return qux(b, c)
+  output = qux(b, c)
+  return output
 end
 ```
 
