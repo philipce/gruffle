@@ -72,7 +72,7 @@ module Gruffle
     # On the other hand, if it's here, what's the point of having the inspector at all?
     def initial_state
       initial_class = self.class.states(:initial).keys.first
-      initial_states = @state_store.of_class(initial_class).values
+      initial_states = @state_store.of_class(initial_class)
       initial_states.find { |s| s.trace.empty? }
     end
 

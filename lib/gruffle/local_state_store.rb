@@ -7,7 +7,7 @@ module Gruffle
     # FIXME: all this needs to be made thread-safe and resilient!
 
     def of_class(*state_classes)
-      @states.select { |_id, state| state_classes.include?(state.class) }
+      @states.values.select { |state| state_classes.include?(state.class) }
     end
 
     def add(state)
