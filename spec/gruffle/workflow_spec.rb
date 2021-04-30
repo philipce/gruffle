@@ -23,15 +23,25 @@ describe Gruffle::Workflow do
 
     it 'returns a workflow instance with initial state' do
       payload = { foo: 123 }
-      workflow_instance = InitializationWorkflow.new(payload)
+      workflow_instance = InitializationWorkflow.new(initial_payload: payload)
 
-      # TODO: maybe the instance shouldn't provide the initial state. Maybe the Gruffle::Inspector _takes_ a workflow
-      # instance (or class) and then you can query the inspector for whatever states you want
-      initial_state = workflow_instance.initial_state
+      inspector = Gruffle::Inspector.new(workflow_instance)
+      initial_state = inspector.initial_state
 
-      expect(workflow_instance.id).to match UUID_REGEX
-      expect(workflow_instance.id).to eq initial_state.workflow_id
+      expect(initial_state.workflow_id).to match UUID_REGEX
       expect(initial_state.payload).to eq payload
+    end
+  end
+
+  describe '#name' do
+    class NameWorkflow < Gruffle::Workflow
+      initial_state InitialState
+      final_state FinalState
+    end
+
+    it 'responds with the class name' do
+      workflow = NameWorkflow.new
+      expect(workflow.name).to eq NameWorkflow.name
     end
   end
 
@@ -88,14 +98,20 @@ describe Gruffle::Workflow do
   end
 
   describe 'workflow state store' do
+    class DefaultStateStoreWorkflow < Gruffle::Workflow
+      state RegularState1
+    end
+
     class NonDefaultStateStore; end
+
     class StateStoreWorkflow < Gruffle::Workflow
       state RegularState1
       state_store NonDefaultStateStore
     end
 
-    class DefaultStateStoreWorkflow < Gruffle::Workflow
+    class StateStoreConfigWorkflow < Gruffle::Workflow
       state RegularState1
+      state_store NonDefaultStateStore, config: { foo: 123 }
     end
 
     before do
@@ -103,24 +119,36 @@ describe Gruffle::Workflow do
       expect(DefaultStateStoreWorkflow).to be_valid
     end
 
-    it 'provides access to the declared state store' do
-      expect(StateStoreWorkflow.state_store).to be_a NonDefaultStateStore
+    it 'has a default work queue' do
+      expect(DefaultStateStoreWorkflow.state_store[:adapter]).to eq Gruffle::LocalStateStore
     end
 
-    it 'has a default work queue' do
-      expect(DefaultStateStoreWorkflow.state_store).to be_a Gruffle::LocalStateStore
+    it 'provides access to the declared state store' do
+      expect(StateStoreWorkflow.state_store[:adapter]).to eq NonDefaultStateStore
+      expect(StateStoreWorkflow.state_store[:config]).to eq nil
+    end
+
+    it 'provides access to the declared state store and its config' do
+      expect(StateStoreConfigWorkflow.state_store[:adapter]).to eq NonDefaultStateStore
+      expect(StateStoreConfigWorkflow.state_store[:config]).to eq({ foo: 123 })
     end
   end
 
   describe 'workflow work queue' do
+    class DefaultWorkQueueWorkflow < Gruffle::Workflow
+      state RegularState1
+    end
+
     class NonDefaultWorkQueue; end
+
     class WorkQueueWorkflow < Gruffle::Workflow
       state RegularState1
       work_queue NonDefaultWorkQueue
     end
 
-    class DefaultWorkQueueWorkflow < Gruffle::Workflow
+    class WorkQueueWorkflow < Gruffle::Workflow
       state RegularState1
+      work_queue NonDefaultWorkQueue, config: { bar: 456 }
     end
 
     before do
@@ -128,12 +156,13 @@ describe Gruffle::Workflow do
       expect(DefaultWorkQueueWorkflow).to be_valid
     end
 
-    it 'provides access to the declared work queue' do
-      expect(WorkQueueWorkflow.work_queue).to be_a NonDefaultWorkQueue
+    it 'has a default work queue' do
+      expect(DefaultWorkQueueWorkflow.work_queue[:adapter]).to eq Gruffle::LocalWorkQueue
     end
 
-    it 'has a default work queue' do
-      expect(DefaultWorkQueueWorkflow.work_queue).to be_a Gruffle::LocalWorkQueue
+    it 'provides access to the declared work queue' do
+      expect(WorkQueueWorkflow.work_queue[:adapter]).to eq NonDefaultWorkQueue
+      expect(WorkQueueWorkflow.work_queue[:config]).to eq({ bar: 456 })
     end
   end
 

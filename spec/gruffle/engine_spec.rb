@@ -17,7 +17,7 @@ describe Gruffle::Engine do
     initial_state Kickoff
     state AssignedNumber
     state SquaredNumber
-    join_state AllNumbersSquared
+    join_state AllNumbersSquared # SquaringComplete?
     final_state SumOfSquares
 
     transition AssignNumbers, source: Kickoff
@@ -32,26 +32,31 @@ describe Gruffle::Engine do
     expect(SumOfSquaresWorkflow).to be_valid
   end
 
-  context 'when processing an instance of a workflow' do
+  context 'when processing a workflow instance' do
     let(:n) { 10 }
     let(:expected_sum_of_squares) { (1..n).reduce(0) { |sum, n| sum + n**2 } }
 
     it 'correctly computes the final state' do
-      workflow_instance = SumOfSquaresWorkflow.new({n: 10})
+      workflow_instance = SumOfSquaresWorkflow.new(initial_payload: {n: 10})
+      inspector = Gruffle::Inspector.new(workflow_instance)
+
       Gruffle::Engine.run(workflow_instance)
 
-      inspector = Gruffle::Inspector(workflow_instance)
-      expect(inspector.states(:final).count).to eq 1
-
       final_state = inspector.states(:final).first
+
+      expect(inspector.states(:final).count).to eq 1
       expect(final_state).to be_a SumOfSquares
       expect(final_state.sum_of_squares).to eq expected_sum_of_squares
     end
   end
 
   context 'when processing a class of workflows' do
+    # TODO: stub any instance of workflow.class and return states
     it 'works'
   end
+
+  # TODO: pass both instance and class and mock next state methods
+  it 'can take a non-homogeneous collection of workflows'
 
   it 'rejects workflows that it is unable to run'
 end

@@ -1,7 +1,6 @@
 module WorkflowStateStore
-  # TODO: add named config param with default nil so config can be provided to initialize adapter (e.g. redis connection details)
-  def state_store(adapter = nil)
-    return assign_state_store_adapter(adapter) unless adapter.nil?
+  def state_store(adapter = nil, config: nil)
+    assign_state_store_adapter(adapter, config) and return if adapter # TODO: and return syntax
     get_state_store_adapter
   end
 
@@ -9,14 +8,15 @@ module WorkflowStateStore
 
   DEFAULT_STATE_STORE = Gruffle::LocalStateStore
 
-  def assign_state_store_adapter(adapter = nil)
+  def assign_state_store_adapter(adapter = nil, config = nil)
     adapter ||= DEFAULT_STATE_STORE
-    @state_store = adapter.new
+    @state_store = adapter
+    @state_store_config = config
     nil
   end
 
   def get_state_store_adapter
     assign_state_store_adapter unless @state_store
-    @state_store
+    { adapter: @state_store, config: @state_store_config }
   end
 end
