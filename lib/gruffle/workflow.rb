@@ -25,6 +25,11 @@ module Gruffle
       @state_store = nil
     end
 
+    # TODO: not sure if it makes sense to attach an id to a workflow instance
+    # Newing up an instance of a workspace gives access to states associated with _every_ instance of the workflow (at
+    # least, it will for like a redis based workflow; for a local store, it gives access to no states, since those
+    # would have been stored in memory allocated by a previous workflow instantiation). Consider getting rid of this id,
+    # and renaming the workflow_id that gets passed to all states to something like execution_id.
     attr_reader :id
 
     def initialize(initial_payload: nil)
