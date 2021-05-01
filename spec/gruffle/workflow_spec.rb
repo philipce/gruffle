@@ -23,12 +23,13 @@ describe Gruffle::Workflow do
 
     it 'returns a workflow instance with initial state' do
       payload = { foo: 123 }
-      workflow_instance = InitializationWorkflow.new(initial_payload: payload)
+      workflow_instance, execution_id = InitializationWorkflow.setup(initial_payload: payload)
 
       inspector = Gruffle::Inspector.new(workflow_instance)
       initial_state = inspector.initial_state
 
-      expect(initial_state.workflow_id).to match UUID_REGEX
+      expect(execution_id).to match UUID_REGEX
+      expect(initial_state.execution_id).to eq execution_id
       expect(initial_state.payload).to eq payload
     end
   end

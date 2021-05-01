@@ -5,9 +5,9 @@ describe Gruffle::State do
 
   describe '#initialize' do
     it 'has the necessary attributes' do
-      state = described_class.new(workflow_name: 'Foo', workflow_id: uuid)
+      state = described_class.new(workflow_name: 'Foo', execution_id: uuid)
       expect(state.workflow_name).to eq 'Foo'
-      expect(state.workflow_id).to match UUID_REGEX
+      expect(state.execution_id).to match UUID_REGEX
       expect(state.name).to eq 'Gruffle::State'
       expect(state.id).to match UUID_REGEX
       expect(state.trace).to be_empty
@@ -19,35 +19,35 @@ describe Gruffle::State do
 
     it 'requires workflow name' do
       name = 'Foo'
-      expect { described_class.new(workflow_name: name, workflow_id: uuid) }.to_not raise_error
-      expect(described_class.new(workflow_name: name, workflow_id: uuid).workflow_name).to eq name
+      expect { described_class.new(workflow_name: name, execution_id: uuid) }.to_not raise_error
+      expect(described_class.new(workflow_name: name, execution_id: uuid).workflow_name).to eq name
       expect { described_class.new }.to raise_error ArgumentError
     end
 
     it 'optionally takes a payload' do
       payload = { a: 1 }
-      state_with_payload = described_class.new(workflow_name: 'Foo', workflow_id: uuid, payload: payload)
-      state_without_payload = described_class.new(workflow_name: 'Foo', workflow_id: uuid)
+      state_with_payload = described_class.new(workflow_name: 'Foo', execution_id: uuid, payload: payload)
+      state_without_payload = described_class.new(workflow_name: 'Foo', execution_id: uuid)
       expect(state_with_payload.payload).to eq payload
       expect(state_without_payload.payload).to eq Hash.new
     end
 
     it 'symbolizes payload keys' do
       payload = { 'a' => 1 }
-      state = described_class.new(workflow_name: 'Foo', workflow_id: uuid, payload: payload)
+      state = described_class.new(workflow_name: 'Foo', execution_id: uuid, payload: payload)
       expect(state.payload).to eq payload.transform_keys(&:to_sym)
     end
 
     it 'duplicates the payload' do
       payload = { a: 1 }
-      state = described_class.new(workflow_name: 'Foo', workflow_id: uuid, payload: payload)
+      state = described_class.new(workflow_name: 'Foo', execution_id: uuid, payload: payload)
       expect(state.payload.equal?(payload)).to eq false
     end
   end
 
   describe '#serialize' do
     it 'serializes to json' do
-      state = described_class.new(workflow_name: 'Foo', workflow_id: uuid)
+      state = described_class.new(workflow_name: 'Foo', execution_id: uuid)
       str = state.serialize
       expect { JSON.parse(str) }.to_not raise_error
     end
@@ -55,11 +55,11 @@ describe Gruffle::State do
 
   describe '.deserialize' do
     it 'recreates a state object from the serialized representation' do
-      original_state = described_class.new(workflow_name: 'Foo', workflow_id: uuid, payload: {a: 1})
+      original_state = described_class.new(workflow_name: 'Foo', execution_id: uuid, payload: {a: 1})
       recreated_state = described_class.deserialize(original_state.serialize)
       expect(recreated_state).to eq original_state
       expect(recreated_state.workflow_name).to eq original_state.workflow_name
-      expect(recreated_state.workflow_id).to eq original_state.workflow_id
+      expect(recreated_state.execution_id).to eq original_state.execution_id
       expect(recreated_state.name).to eq original_state.name
       expect(recreated_state.id).to eq original_state.id
       expect(recreated_state.trace).to eq original_state.trace
@@ -75,12 +75,12 @@ describe Gruffle::State do
     class SuccessorState < Gruffle::State; end
 
     it 'creates a successor state based on the original state' do
-      original_state = OriginalState.new(workflow_name: 'Foo', workflow_id: uuid)
+      original_state = OriginalState.new(workflow_name: 'Foo', execution_id: uuid)
       successor_state = SuccessorState.derive(original_state)
 
       expect(successor_state.class).to eq SuccessorState
       expect(successor_state.workflow_name).to eq original_state.workflow_name
-      expect(successor_state.workflow_id).to eq original_state.workflow_id
+      expect(successor_state.execution_id).to eq original_state.execution_id
       expect(successor_state.name).to eq 'SuccessorState'
       expect(successor_state.id).to match UUID_REGEX
       expect(successor_state.id).to_not eq original_state.id

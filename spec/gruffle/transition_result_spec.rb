@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe Gruffle::Transition::Result do
   let(:uuid) { SecureRandom.uuid }
-  let(:state_1) { Gruffle::State.new(workflow_name: 'Foo', workflow_id: uuid, payload: {a: 1}) }
-  let(:state_2) { Gruffle::State.new(workflow_name: 'Bar', workflow_id: uuid, payload: {b: 2}) }
+  let(:state_1) { Gruffle::State.new(workflow_name: 'Foo', execution_id: uuid, payload: {a: 1}) }
+  let(:state_2) { Gruffle::State.new(workflow_name: 'Bar', execution_id: uuid, payload: {b: 2}) }
 
   describe 'successors' do
     it 'takes an array of successors' do

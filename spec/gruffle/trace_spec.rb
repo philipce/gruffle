@@ -9,7 +9,7 @@ describe Gruffle::Trace do
   end
 
   it 'can act as an array of points' do
-    state_1 = Gruffle::State.new(workflow_name: 'Foo', workflow_id: uuid)
+    state_1 = Gruffle::State.new(workflow_name: 'Foo', execution_id: uuid)
     trace = described_class.new
 
     # TODO: push method should take transition and transition_result too (here and everywhere else it's called)
@@ -20,14 +20,14 @@ describe Gruffle::Trace do
     expect(trace[-1]).to eq trace.last
     expect(trace.first.state_name).to eq state_1.name
 
-    state_2 = Gruffle::State.new(workflow_name: 'Foo', workflow_id: uuid)
+    state_2 = Gruffle::State.new(workflow_name: 'Foo', execution_id: uuid)
     trace.push(state: state_2)
     expect(trace.first.state_name).to eq state_1.name
     expect(trace.last.state_name).to eq state_2.name
   end
 
   it 'can be compared against other traces for equality' do
-    state = Gruffle::State.new(workflow_name: 'Foo', workflow_id: uuid)
+    state = Gruffle::State.new(workflow_name: 'Foo', execution_id: uuid)
     trace_1 = described_class.new
     trace_2 = described_class.new
     trace_1.push(state: state)
@@ -37,7 +37,7 @@ describe Gruffle::Trace do
   end
 
   it 'can create a deep copy of itself' do
-    state = Gruffle::State.new(workflow_name: 'Foo', workflow_id: uuid)
+    state = Gruffle::State.new(workflow_name: 'Foo', execution_id: uuid)
     trace_1 = described_class.new
     trace_2 = trace_1.deep_dup
     trace_2.push(state: state)
@@ -58,8 +58,8 @@ describe Gruffle::Trace do
     class BarState < Gruffle::State; end
 
     it 'recreates a trace object from the hash representation' do
-      state_1 = FooState.new(workflow_name: 'Foo', workflow_id: uuid)
-      state_2 = BarState.new(workflow_name: 'Bar', workflow_id: uuid)
+      state_1 = FooState.new(workflow_name: 'Foo', execution_id: uuid)
+      state_2 = BarState.new(workflow_name: 'Bar', execution_id: uuid)
       original_trace = described_class.new
       original_trace.push(state: state_1)
       original_trace.push(state: state_2)
@@ -74,7 +74,7 @@ describe Gruffle::Trace do
   end
 
   describe 'point in a trace' do
-    let(:state) { Gruffle::State.new(workflow_name: 'Foo', workflow_id: uuid) }
+    let(:state) { Gruffle::State.new(workflow_name: 'Foo', execution_id: uuid) }
     let(:trace) { described_class.new }
     let(:point) { trace.last }
 

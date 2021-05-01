@@ -5,7 +5,7 @@ require 'json'
 module Gruffle
   class State
     attr_reader :workflow_name
-    attr_reader :workflow_id # TODO: call this instance_id?
+    attr_reader :execution_id # TODO: call this instance_id?
     attr_reader :name
     attr_reader :id
     attr_reader :trace
@@ -24,7 +24,7 @@ module Gruffle
       # other route (always accumulate), we'd eventually blow up in memory potentially
       derived_payload = {}
 
-      successor_state = new(workflow_name: original_state.workflow_name, workflow_id: original_state.workflow_id, payload: derived_payload)
+      successor_state = new(workflow_name: original_state.workflow_name, execution_id: original_state.execution_id, payload: derived_payload)
 
       # TODO: somehow derive will need to take a transition to add transition attributes to trace
       # Perhaps the user is never responsible for calling derive directly. The workflow engine could take a state and
@@ -49,7 +49,7 @@ module Gruffle
       # TODO: add note to docs somewhere about how payload isn't parsed beyond native json types
       # - for example dates in payload will be strings, not Time objects. But integers will parse as ints.
       # - this is probably one of the main things that you'll define in your state subclass--accessor methods to parse payload
-      state = new(workflow_name: hash[:workflow_name], workflow_id: hash[:workflow_id], payload: hash[:payload])
+      state = new(workflow_name: hash[:workflow_name], execution_id: hash[:execution_id], payload: hash[:payload])
 
       state.instance_variable_set(:@id, hash[:id])
       state.instance_variable_set(:@trace, Trace.from_hash(hash[:trace]))
@@ -60,9 +60,9 @@ module Gruffle
       state
     end
 
-    def initialize(workflow_name:, workflow_id:, payload: nil)
+    def initialize(workflow_name:, execution_id:, payload: nil)
       @workflow_name = workflow_name
-      @workflow_id = workflow_id
+      @execution_id = execution_id
       @name = self.class.name
       @id = SecureRandom.uuid
       @trace = Trace.new
@@ -75,7 +75,7 @@ module Gruffle
     def serialize
       {
         workflow_name: workflow_name,
-        workflow_id: workflow_id,
+        execution_id: execution_id,
         name: name,
         id: id,
         trace: trace,
