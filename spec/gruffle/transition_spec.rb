@@ -6,19 +6,22 @@ describe Gruffle::Transition do
   let(:transition) { Gruffle::Transition.new }
 
   it 'has a name' do
-    expect(transition.name).to eq 'Transition'
+    expect(transition.name).to eq 'Gruffle::Transition'
   end
 
-  it 'returns a result when called with a state' do
-    result = transition.call(state)
-    expect(result.is_a? Gruffle::Transition::Result).to eq true
+  it 'requires subclass to override call method' do
+    expect { transition.call(state) }.to raise_error /must implement call function/
   end
 
-  it 'has a side_effectors method' do
+  it 'provides access to state_store' do
+    expect(transition).to respond_to :state_store
+  end
+
+  it 'provides access to side_effectors' do
     expect(transition).to respond_to :side_effectors
   end
 
-  it 'has a log_events method' do
-    expect(transition).to respond_to :log_event
+  it 'provides access to logger' do
+    expect(transition).to respond_to :logger
   end
 end

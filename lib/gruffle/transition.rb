@@ -1,24 +1,25 @@
 module Gruffle
   class Transition
-    attr_reader :name
-
-    def self.name
-      super.split('::').last
-    end
-
-    # TODO: what are the threading implications of newing this up as an instance?
-    # What code is thread safe? Reentrant? What about sharing memory?
-    def initialize(side_effectors: nil, logger: nil)
-      @name = self.class.name
-
-      # TODO: make these available through side_effectors and log_event methods
-      # - logger should default not to nil but to the standard gruffle logger
+    def initialize(state_store: nil, side_effectors: nil, logger: nil)
+      # TODO: come up with better defaults for these params than nil
+      # - not sure if there are better defaults for all of them, but e.g. logger could be Gruffle::DEFAULT_LOGGER
+      @state_store = state_store
       @side_effectors = side_effectors
       @logger = logger
     end
 
-    def call(state)
-      Transition::Result.new(successors: nil)
+    def name
+      self.class.name
+    end
+
+    def call(_state)
+      raise "Transition subclass must implement call function"
+    end
+
+    def state_store
+      # TODO: this should be a stripped down interface into state store
+      # - read only view into the state store
+      # - possibly restricted to just states in the current execution id
     end
 
     def side_effectors
@@ -27,11 +28,10 @@ module Gruffle
       @side_effectors
     end
 
-    def log_event(hash)
-      # TODO: decide on and spec the log_event method interface
-      # It needs to align with whatever the interface Gruffle requires of loggers
-      return if @logger.nil?
-      @logger.log_event(hash)
+    def logger
+      # TODO: decide on and spec the gruffle logger interface
+      # - probably should match the standard ruby logger interface
+      @logger
     end
   end
 end
