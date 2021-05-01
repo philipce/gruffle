@@ -14,5 +14,9 @@ module Gruffle
       # TODO: raise error if trying to override existing state
       @states[state.id] = state
     end
+
+    def get(id)
+      @states[id]
+    end
   end
 end
