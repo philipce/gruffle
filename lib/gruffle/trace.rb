@@ -62,7 +62,8 @@ module Gruffle
       end
 
       def initialize(state:)
-        # TODO: take transition as well and store: transition_started_at, transition_finished_at, transition_status
+        # TODO: this should probably take a state transition as param
+        # - need to save off transition details: transition_started_at, transition_ended_at, transition_status
         @state_name = state.name
         @state_id = state.id
         @state_created_at = state.created_at
