@@ -51,7 +51,7 @@ describe Gruffle::Workflow do
       initial_state InitialState
       final_state FinalState
 
-      transition FirstTransition, source: InitialState
+      transition FirstTransition, origin: InitialState
     end
 
     it 'can apply the correct transition to the given state' do
@@ -108,8 +108,8 @@ describe Gruffle::Workflow do
       state RegularState1
       final_state FinalState
 
-      transition FirstTransition, source: InitialState
-      transition SecondTransition, source: RegularState1
+      transition FirstTransition, origin: InitialState
+      transition SecondTransition, origin: RegularState1
     end
 
     before do
@@ -204,12 +204,12 @@ describe Gruffle::Workflow do
     class NotAGruffleTransition; end
     class NonConformingInheritanceWorkflow < Gruffle::Workflow
       state NotAGruffleState
-      transition NotAGruffleTransition, source: NotAGruffleState
+      transition NotAGruffleTransition, origin: NotAGruffleState
     end
 
     class AbstractBassClassWorkflow < Gruffle::Workflow
       state Gruffle::State
-      transition Gruffle::Transition, source: Gruffle::State
+      transition Gruffle::Transition, origin: Gruffle::State
     end
 
     it 'provides methods to determine workflow validity' do

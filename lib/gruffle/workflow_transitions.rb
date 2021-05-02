@@ -1,12 +1,10 @@
 module WorkflowTransitions
-  def transition(klass, source:)
+  def transition(transition_class, origin:)
     # TODO: allow other options when declaring transition
     # - condition:
     # - error:
 
-    transition_klass = klass
-    state_klass = source
-    @transitions[state_klass] = transition_klass
+    @transitions[origin] = transition_class
     nil
   end
 
