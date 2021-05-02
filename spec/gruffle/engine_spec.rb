@@ -20,9 +20,9 @@ describe Gruffle::Engine do
     join_state AllNumbersSquared # SquaringComplete?
     final_state SumOfSquares
 
-    transition AssignNumbers, source: Kickoff
-    transition SquareNumber, source: AssignedNumber
-    transition SumSquares, source: AllNumbersSquared # TODO: is source the wrong word here? Origin seems better. Origin -> Transition -> Result
+    transition AssignNumbers, origin: Kickoff
+    transition SquareNumber, origin: AssignedNumber
+    transition SumSquares, origin: AllNumbersSquared
 
     state_store Gruffle::LocalStateStore
     work_queue Gruffle::LocalWorkQueue
@@ -37,14 +37,15 @@ describe Gruffle::Engine do
     let(:expected_sum_of_squares) { (1..n).reduce(0) { |sum, n| sum + n**2 } }
 
     it 'correctly computes the final state' do
-      workflow_instance = SumOfSquaresWorkflow.new(initial_payload: {n: 10})
-      inspector = Gruffle::Inspector.new(workflow_instance)
+      workflow, _ = SumOfSquaresWorkflow.setup(initial_payload: {n: 10})
 
-      Gruffle::Engine.run(workflow_instance)
+      Gruffle::Engine.run(workflow)
 
-      final_state = inspector.states(:final).first
+      inspector = Gruffle::Inspector.new(workflow)
+      final_states = inspector.final_states
+      final_state = final_states.first
 
-      expect(inspector.states(:final).count).to eq 1
+      expect(final_states.count).to eq 1
       expect(final_state).to be_a SumOfSquares
       expect(final_state.sum_of_squares).to eq expected_sum_of_squares
     end

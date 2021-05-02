@@ -1,5 +1,8 @@
 module Gruffle
   class LocalStateStore
+    # TODO: revisit the state store interface
+    # - what common methods need to be on every adapter (e.g. redis, postgres, etc)
+
     def initialize
       @states = {}
     end
