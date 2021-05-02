@@ -70,5 +70,12 @@ module Gruffle
       id = @work_queue.next
       @state_store.get(id)
     end
+
+    def process(state)
+      # TODO: make this capable of handling multiple transitions with the same origin
+      transition_class = self.class.transitions(state.class).first
+      transition = transition_class.new
+      transition.process(state)
+    end
   end
 end

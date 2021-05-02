@@ -9,8 +9,8 @@ describe Gruffle::Transition do
     expect(transition.name).to eq 'Gruffle::Transition'
   end
 
-  it 'requires subclass to override call method' do
-    expect { transition.call(state) }.to raise_error /must implement call function/
+  it 'requires a subclass to override process method' do
+    expect { transition.process(state) }.to raise_error /must implement process method/
   end
 
   it 'provides access to state_store' do

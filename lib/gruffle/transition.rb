@@ -12,8 +12,8 @@ module Gruffle
       self.class.name
     end
 
-    def call(_state)
-      raise "Transition subclass must implement call function"
+    def process(_state)
+      raise "Transition subclass must implement process method"
     end
 
     def state_store

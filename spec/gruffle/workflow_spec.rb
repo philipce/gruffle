@@ -46,6 +46,32 @@ describe Gruffle::Workflow do
     end
   end
 
+  describe '#process' do
+    class ProcessWorkflow < Gruffle::Workflow
+      initial_state InitialState
+      final_state FinalState
+
+      transition FirstTransition, source: InitialState
+    end
+
+    it 'can apply the correct transition to the given state' do
+      workflow = ProcessWorkflow.new
+      uuid = SecureRandom.uuid
+      state = InitialState.new(workflow_name: workflow, execution_id: uuid)
+
+      expect_any_instance_of(FirstTransition).to receive(:call).with(state)
+      state_transition = workflow.send(:process, state)
+
+      # TODO: expect all fields to be filled out (e.g. origin, timing info, etc)
+      expect(state_transition.successors).to eq FinalState
+      expect(state_transition.status).to eq :ok
+    end
+
+    # TODO: try passing by something other than a state transition and watch it blow up
+    it 'ensures a state transition is returned'
+
+  end
+
   describe 'workflow states' do
     class StatesWorkflow < Gruffle::Workflow
       initial_state InitialState
