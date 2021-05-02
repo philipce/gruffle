@@ -75,7 +75,40 @@ module Gruffle
       # TODO: make this capable of handling multiple transitions with the same origin
       transition_class = self.class.transitions(state.class).first
       transition = transition_class.new
-      transition.process(state)
+
+      start_time = Time.now.utc
+      begin
+        state_transition = transition.process(state)
+
+        # TODO: validate state transition
+        # - e.g. require exactly 1 join state if successors.count > 1
+
+        # TODO: handle fork/join tokens
+        # - make sure nested forking is joined correctly (join state needs to carry fork token forward)
+
+        status = :ok
+      # rescue Gruffle::Retry => e
+      #   # TODO: transition back to same state
+      #   raise "TODO: handle retry (#{e.message})"
+      #   status = :retry
+      rescue => e
+        # TODO: lookup error state and transition to it
+        # Error state is 1) state specified on transition, 2) state specified on workflow, 3) gruffle global error
+        raise "TODO: handle error (#{e.message})"
+        status = :error
+      end
+      end_time = Time.now.utc
+      duration = end_time - start_time
+
+      state_transition.send(:origin=, state)
+      state_transition.send(:status=, status)
+      state_transition.send(:started_at=, start_time)
+      state_transition.send(:ended_at=, end_time)
+      state_transition.send(:duration=, duration)
+
+      # TODO: set state transition message based on rescued error message
+
+      state_transition
     end
   end
 end

@@ -47,11 +47,19 @@ describe Gruffle::Workflow do
   end
 
   describe '#process' do
+    class SkipToTheEnd < Gruffle::Transition
+      def process(state)
+        Gruffle::StateTransition.new(
+          successors: FinalState.derive(state, payload: { foo: 123 }),
+        )
+      end
+    end
+
     class ProcessWorkflow < Gruffle::Workflow
       initial_state InitialState
       final_state FinalState
 
-      transition FirstTransition, origin: InitialState
+      transition SkipToTheEnd, origin: InitialState
     end
 
     it 'can apply the correct transition to the given state' do
@@ -59,17 +67,34 @@ describe Gruffle::Workflow do
       uuid = SecureRandom.uuid
       state = InitialState.new(workflow_name: workflow, execution_id: uuid)
 
-      expect_any_instance_of(FirstTransition).to receive(:call).with(state)
+      start_time = Time.parse('2021-04-01T12:34:56Z')
+      end_time = Time.parse('2021-04-01T12:34:58.9Z')
+      duration = end_time - start_time
+
+      allow(Time).to receive(:now).and_return(start_time, end_time)
+
       state_transition = workflow.send(:process, state)
 
-      # TODO: expect all fields to be filled out (e.g. origin, timing info, etc)
-      expect(state_transition.successors).to eq FinalState
+      expect(state_transition.origin).to eq state
+      expect(state_transition.successors.count).to eq 1
+      expect(state_transition.successors.first.state).to be_a FinalState
+      expect(state_transition.successors.first.state.payload).to eq({ foo: 123 })
       expect(state_transition.status).to eq :ok
+      expect(state_transition.started_at).to eq start_time
+      expect(state_transition.ended_at).to eq end_time
+      expect(state_transition.duration).to eq duration
+    end
+
+    context 'when the transition raises a retry' do
+      it 'works'
+    end
+
+    context 'when the transition raises an error' do
+      it 'works'
     end
 
     # TODO: try passing by something other than a state transition and watch it blow up
     it 'ensures a state transition is returned'
-
   end
 
   describe 'workflow states' do
