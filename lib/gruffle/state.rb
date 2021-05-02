@@ -14,25 +14,20 @@ module Gruffle
     attr_reader :created_at
     attr_reader :payload
 
-    def self.derive(original_state)
-      # TODO: accept params to modify payload and attributes
-      # For example: derive(original_state, payload: {}, attributes: {})
-      # Need to decide what attributes are even modifiable; it may just be fork/join tokens
-      # Also need to decide how payload works; does it accumulate by default? Or get replaced anew each derive? My first
-      # thought is it should get wiped every time as it's probably the typical case we just care about new params. If
-      # the user wants to accumulate params, that'd be easy to slice out and include in the new payload. If we went the
-      # other route (always accumulate), we'd eventually blow up in memory potentially
-      derived_payload = {}
-
-      successor_state = new(workflow_name: original_state.workflow_name, execution_id: original_state.execution_id, payload: derived_payload)
+    def self.derive(origin, payload: {})
+      successor_state = new(
+        workflow_name: origin.workflow_name,
+        execution_id: origin.execution_id,
+        payload: payload
+      )
 
       # TODO: somehow derive will need to take a transition to add transition attributes to trace
       # Perhaps the user is never responsible for calling derive directly. The workflow engine could take a state and
       # the relevant transition, call transition(state), then expect the transition result to just contain subsequent
       # states. The engine could then call the derive function and pass in transition result details too. It would mean
       # the transition result would need to allow specifying payload/attribute updates
-      new_trace = original_state.trace.deep_dup
-      new_trace.push(state: original_state)
+      new_trace = origin.trace.deep_dup
+      new_trace.push(state: origin)
       successor_state.instance_variable_set(:@trace, new_trace)
 
       # TODO: derive needs to allow setting new fork/join tokens

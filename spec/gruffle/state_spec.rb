@@ -74,7 +74,7 @@ describe Gruffle::State do
     class OriginalState < Gruffle::State; end
     class SuccessorState < Gruffle::State; end
 
-    it 'creates a successor state based on the original state' do
+    it 'creates a successor state based on the original state, with an empty payload by default' do
       original_state = OriginalState.new(workflow_name: 'Foo', execution_id: uuid)
       successor_state = SuccessorState.derive(original_state)
 
@@ -87,12 +87,15 @@ describe Gruffle::State do
       expect(successor_state.trace.length).to eq original_state.trace.length + 1
       expect(successor_state.trace.last.state_name).to eq original_state.name
       expect(Time.now - successor_state.created_at).to be < 1
-      expect(successor_state.payload).to eq original_state.payload
+      expect(successor_state.payload).to eq(Hash.new)
     end
 
-    # TODO: implement this behavior
-    it 'allows modifying the payload'
-    it 'allows modifying certain attributes (e.g. fork/join token)'
+    it 'allows setting a new payload' do
+      original_state = OriginalState.new(workflow_name: 'Foo', execution_id: uuid)
+      payload = { omg: 'itworks' }
+      successor_state = SuccessorState.derive(original_state, payload: payload)
+      expect(successor_state.payload).to eq(payload)
+    end
   end
 end
 
