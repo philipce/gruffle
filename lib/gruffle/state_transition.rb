@@ -33,8 +33,8 @@ module Gruffle
     # Methods below are used by the workflow engine to add data to a user supplied transition result; this saves the
     # user from having to collect/supply this data in each of their transitions.
 
-    def name=(name)
-      @name = name
+    def origin=(state)
+      @origin = state
     end
 
     # TODO: what validation, if any, should be applied to status?
@@ -45,10 +45,6 @@ module Gruffle
     # that in deserializing (e.g. in trace point)
     def status=(status)
       @status = status
-    end
-
-    def message=(message)
-      @message = message
     end
 
     def started_at=(started_at)

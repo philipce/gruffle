@@ -52,6 +52,11 @@ describe Gruffle::StateTransition do
   describe 'private methods for use by workflow engine' do
     let(:state_transition) { described_class.new(successors: []) }
 
+    it 'can set origin' do
+      state_transition.send(:origin=, state_1)
+      expect(state_transition.origin).to eq state_1
+    end
+
     it 'can set transition status' do
       status = :ok
       state_transition.send(:status=, status)
